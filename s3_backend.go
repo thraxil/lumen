@@ -34,7 +34,7 @@ func (s s3Backend) String() string {
 	return "S3"
 }
 
-func (s *s3Backend) Write(key key, r io.ReadCloser) error {
+func (s *s3Backend) Write(key string, r io.ReadCloser) error {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		log.Println("error writing into buffer")
@@ -43,7 +43,7 @@ func (s *s3Backend) Write(key key, r io.ReadCloser) error {
 	}
 
 	// TODO support mimetypes
-	err = s.bucket.Put(key.String(), b, "application/octet", s3.BucketOwnerFull)
+	err = s.bucket.Put(key, b, "application/octet", s3.BucketOwnerFull)
 	if err != nil {
 		log.Println("uh oh. couldn't write to bucket")
 		log.Println(err)
@@ -52,20 +52,20 @@ func (s *s3Backend) Write(key key, r io.ReadCloser) error {
 	return nil
 }
 
-func (s s3Backend) Read(key key) ([]byte, error) {
-	return s.bucket.Get(key.String())
+func (s s3Backend) Read(key string) ([]byte, error) {
+	return s.bucket.Get(key)
 }
 
-func (s s3Backend) Exists(key key) bool {
-	ls, err := s.bucket.List(key.String(), "", "", 1)
+func (s s3Backend) Exists(key string) bool {
+	ls, err := s.bucket.List(key, "", "", 1)
 	if err != nil {
 		return false
 	}
 	return len(ls.Contents) == 1
 }
 
-func (s *s3Backend) Delete(key key) error {
-	return s.bucket.Del(key.String())
+func (s *s3Backend) Delete(key string) error {
+	return s.bucket.Del(key)
 }
 
 func (s s3Backend) FreeSpace() uint64 {

@@ -18,11 +18,11 @@ type config struct {
 	S3SecretKey string `envconfig:"S3_SECRET_KEY"`
 	S3Bucket    string `envconfig:"S3_BUCKET"`
 
-	Port          int
-	ClusterSecret string `envconfig:"CLUSTER_SECRET"`
-	MaxProcs      int    `envconfig:"MAX_PROCS"`
-	ReadTimeout   int    `envconfig:"READ_TIMEOUT"`
-	WriteTimeout  int    `envconfig:"WRITE_TIMEOUT"`
+	Port         int
+	Secret       string `envconfig:"SECRET"`
+	MaxProcs     int    `envconfig:"MAX_PROCS"`
+	ReadTimeout  int    `envconfig:"READ_TIMEOUT"`
+	WriteTimeout int    `envconfig:"WRITE_TIMEOUT"`
 }
 
 func main() {
@@ -36,8 +36,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	mux.NewRouter()
+	s := Server{config: c}
+	r := mux.NewRouter()
+	r.HandleFunc("/", s.Index).Methods("GET")
+	r.HandleFunc("/", s.Upload).Methods("POST")
 
+	hs := http.Server{
+		Addr:    fmt.Sprintf(":%d", c.Port),
+		Handler: logTop(r, sl),
+	}
+	hs.ListenAndServe()
 }
 
 func logTop(handler http.Handler, sl log.Logger) http.Handler {
