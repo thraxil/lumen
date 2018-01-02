@@ -33,7 +33,11 @@ secret: <input type="password" name="secret" class="form-control"/><br />
 }
 
 func (s Server) Upload(w http.ResponseWriter, r *http.Request) {
-
+	if !s.config.ValidKey(r.FormValue("secret")) {
+		// TODO:  log this
+		http.Error(w, "invalid upload secret", 403)
+		return
+	}
 }
 
 func (s Server) Favicon(w http.ResponseWriter, r *http.Request) {

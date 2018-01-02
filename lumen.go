@@ -28,6 +28,12 @@ type config struct {
 	WriteTimeout int    `envconfig:"WRITE_TIMEOUT"`
 }
 
+func (c config) ValidKey(key string) bool {
+	// trivial function now but eventually this
+	// will be more flexible
+	return key == c.Secret
+}
+
 func main() {
 	sl := newSTDLogger()
 	sl.Log("level", "INFO", "msg", "starting logger")
