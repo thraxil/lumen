@@ -41,8 +41,10 @@ func main() {
 
 	s := Server{config: c}
 	r := mux.NewRouter()
+
 	r.HandleFunc("/", s.Index).Methods("GET")
 	r.HandleFunc("/", s.Upload).Methods("POST")
+	r.HandleFunc("/favicon.ico", s.Favicon)
 
 	hs := http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Port),

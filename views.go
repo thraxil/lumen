@@ -35,3 +35,7 @@ secret: <input type="password" name="secret" class="form-control"/><br />
 func (s Server) Upload(w http.ResponseWriter, r *http.Request) {
 
 }
+
+func (s Server) Favicon(w http.ResponseWriter, r *http.Request) {
+	// just ignore this crap
+}
