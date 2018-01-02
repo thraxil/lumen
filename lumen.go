@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -45,7 +48,25 @@ func main() {
 		Addr:    fmt.Sprintf(":%d", c.Port),
 		Handler: logTop(r, sl),
 	}
-	hs.ListenAndServe()
+
+	go func() {
+		hs.ListenAndServe()
+	}()
+
+	// graceful shutdown on SIGTERM
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	<-stop
+
+	sctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err = hs.Shutdown(sctx); err != nil {
+		sl.Log("level", "ERR", "msg", "error on  shutdown", "error", err)
+	} else {
+		sl.Log("level", "INFO", "msg", "Server Stopped")
+	}
 }
 
 func logTop(handler http.Handler, sl log.Logger) http.Handler {
