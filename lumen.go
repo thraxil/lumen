@@ -45,8 +45,11 @@ func main() {
 	r.HandleFunc("/", s.Upload).Methods("POST")
 
 	hs := http.Server{
-		Addr:    fmt.Sprintf(":%d", c.Port),
-		Handler: logTop(r, sl),
+		Addr:         fmt.Sprintf(":%d", c.Port),
+		Handler:      logTop(r, sl),
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 
 	go func() {
