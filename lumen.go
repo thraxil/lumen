@@ -52,6 +52,7 @@ func main() {
 
 	r.HandleFunc("/", s.Index).Methods("GET")
 	r.HandleFunc("/", s.Upload).Methods("POST")
+	r.HandleFunc("/image/{hash}/{size}/{filename}", s.Serve).Methods("GET")
 	r.HandleFunc("/favicon.ico", s.Favicon)
 
 	hs := http.Server{

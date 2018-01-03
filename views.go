@@ -6,8 +6,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/go-kit/kit/log"
+	"github.com/gorilla/mux"
 	"github.com/thraxil/resize"
 )
 
@@ -115,6 +119,53 @@ func (s Server) Upload(w http.ResponseWriter, r *http.Request) {
 	//	s.Uploaded(imageRecord{*ahash, ext})
 }
 
+func (s Server) Serve(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+	size := vars["size"]
+	filename := vars["filename"]
+
+	ahash, err := hashFromString(hash, "")
+	if err != nil {
+		http.Error(w, "invalid hash", http.StatusNotFound)
+		return
+	}
+
+	sspec := resize.MakeSizeSpec(size)
+	if sspec.String() != size {
+		// force normalization of size spec
+		http.Redirect(w, r, "/image/"+ahash.String()+"/"+sspec.String()+"/"+filename, http.StatusMovedPermanently)
+		return
+	}
+
+	extension := filepath.Ext(filename)
+	if extension == ".jpeg" {
+		// normalize .jpeg to .jpg
+		fixedFilename := strings.Replace(filename, ".jpeg", ".jpg", 1)
+		http.Redirect(w, r, "/image/"+ahash.String()+"/"+sspec.String()+"/"+fixedFilename, http.StatusMovedPermanently)
+		return
+	}
+	ri := &imageSpecifier{ahash, sspec, extension}
+
+	imgData, err := s.backend.Read(ri.Path())
+	if err != nil {
+		// for now we just have to 404
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	} else {
+		w = setCacheHeaders(w, ri.Extension)
+		w.Write(imgData)
+	}
+
+	fmt.Println(hash, size, filename)
+}
+
 func (s Server) Favicon(w http.ResponseWriter, r *http.Request) {
 	// just ignore this crap
+}
+
+func setCacheHeaders(w http.ResponseWriter, extension string) http.ResponseWriter {
+	w.Header().Set("Content-Type", extmimes[extension])
+	w.Header().Set("Expires", time.Now().Add(time.Hour*24*365).Format(time.RFC1123))
+	return w
 }

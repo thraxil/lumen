@@ -15,16 +15,6 @@ type imageSpecifier struct {
 	Extension string // with leading '.'
 }
 
-func (i imageSpecifier) String() string {
-	return path.Join(i.Hash.String(), i.Size.String(), "image"+i.Extension)
-}
-
-func resizedPath(imagePath, size string) string {
-	d := filepath.Dir(imagePath)
-	extension := filepath.Ext(imagePath)
-	return path.Join(d, size+extension)
-}
-
 func newImageSpecifier(s string) *imageSpecifier {
 	parts := strings.Split(s, "/")
 	ahash, _ := hashFromString(parts[0], "")
@@ -34,6 +24,20 @@ func newImageSpecifier(s string) *imageSpecifier {
 	fparts := strings.Split(filename, ".")
 	extension := "." + fparts[1]
 	return &imageSpecifier{Hash: ahash, Size: rs, Extension: extension}
+}
+
+func (i imageSpecifier) String() string {
+	return path.Join(i.Hash.String(), i.Size.String(), "image"+i.Extension)
+}
+
+func (i imageSpecifier) Path() string {
+	return path.Join(i.Hash.String(), i.Size.String()+i.Extension)
+}
+
+func resizedPath(imagePath, size string) string {
+	d := filepath.Dir(imagePath)
+	extension := filepath.Ext(imagePath)
+	return path.Join(d, size+extension)
 }
 
 func (i imageSpecifier) sizedPath() string {
