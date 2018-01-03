@@ -104,6 +104,7 @@ func (s Server) Upload(w http.ResponseWriter, r *http.Request) {
 		FullURL:   "/image/" + ahash.String() + "/full/image" + ext,
 		Satisfied: true,
 		Length:    fh.Size,
+		Nodes:     []string{},
 	}
 	b, err := json.Marshal(id)
 	if err != nil {
