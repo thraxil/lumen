@@ -92,7 +92,11 @@ func (s Server) Upload(w http.ResponseWriter, r *http.Request) {
 		resize.MakeSizeSpec("full"),
 		ext,
 	}
-	s.backend.Write(ri.fullSizePath(), i)
+	err = s.backend.Write(ri.fullSizePath(), i)
+	if err != nil {
+		http.Error(w, "S3: "+err.Error(), 500)
+		return
+	}
 
 	id := imageData{
 		Hash:      ahash.String(),
