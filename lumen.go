@@ -45,7 +45,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	s := Server{config: c}
+	s3b := newS3Backend(c.S3AccessKey, c.S3SecretKey, c.S3Bucket)
+
+	s := Server{config: c, backend: s3b, logger: sl}
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", s.Index).Methods("GET")

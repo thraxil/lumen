@@ -51,6 +51,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/thraxil/resize"
+  packages = ["."]
+  revision = "e4fe93a12666e44f7d55dad20472c93d72f86944"
+
+[[projects]]
+  branch = "master"
   name = "github.com/vaughan0/go-ini"
   packages = ["."]
   revision = "a98ad7ee00ec53921f08832bc06ecf7fd600e6a1"
@@ -58,6 +64,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "346a11a07edf24f5340b2e16bdfcd7fda5651dd687955b0784ff46004b3c2450"
+  inputs-digest = "d6127014d7a89021690bc8a890559215af250122fa140e3fc423a2db3269af3d"
   solver-name = "gps-cdcl"
   solver-version = 1
