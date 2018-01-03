@@ -54,7 +54,7 @@ var extmimes = map[string]string{
 
 type imageData struct {
 	Hash      string `json:"hash"`
-	Length    int    `json:"length"`
+	Length    int64  `json:"length"`
 	Extension string `json:"extension"`
 	FullURL   string `json:"full_url"`
 	// we don't use these fields, but retain them for reticulum compat
@@ -99,6 +99,7 @@ func (s Server) Upload(w http.ResponseWriter, r *http.Request) {
 		Extension: ext,
 		FullURL:   "/image/" + ahash.String() + "/full/image" + ext,
 		Satisfied: true,
+		Length:    fh.Size,
 	}
 	b, err := json.Marshal(id)
 	if err != nil {
